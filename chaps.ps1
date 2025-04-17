@@ -263,7 +263,7 @@ Catch{
 <#
 Gist Grimthorr/pending-updates.ps1: https://gist.github.com/Grimthorr/44727ea8cf5d3df11cf7
 #>
-$inf_str + "Checking for missing Windows patches with Critical or Important MsrcSeverity values. NOTE: This make take a few minutes." | Tee-Object -FilePath $out_file -Append
+$inf_str + "Checking for missing Windows patches with Critical or Important MsrcSeverity values. NOTE: This may take a while." | Tee-Object -FilePath $out_file -Append
 Try{
     $UpdateSession = New-Object -ComObject Microsoft.Update.Session
     $UpdateSearcher = $UpdateSession.CreateupdateSearcher()
@@ -314,6 +314,7 @@ Catch{
 <#
 Resources:
 Windows Privilege Escalation Fundamentals: http://www.fuzzysecurity.com/tutorials/16.html
+Abusing MSI's Elevated Privileges: https://www.greyhathacker.net/?p=185
 #>
 $inf_str + "Checking if users can install software as NT AUTHORITY\SYSTEM" | Tee-Object -FilePath $out_file -Append
 Try{
@@ -324,13 +325,13 @@ Try{
         $ressysele = $null;
     }
     Try{
-        $resusrele = Get-ItemProperty -path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated' -ErrorAction stop
+        $resusrele = Get-ItemProperty -path 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated' -ErrorAction stop
     }
     Catch{
         $resusrele = $null;
     }
 
-    if ($ressysele -or $resusrele){
+    if ($ressysele -and $resusrele){
             $neg_str + "Users can install software as NT AUTHORITY\SYSTEM." | Tee-Object -FilePath $out_file -Append
     } else {
             $pos_str + "Users cannot install software as NT AUTHORITY\SYSTEM." | Tee-Object -FilePath $out_file -Append
